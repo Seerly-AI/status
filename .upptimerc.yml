@@ -1,31 +1,56 @@
-# Change these first
-owner: upptime # Your GitHub organization or username, where this repository lives
-repo: upptime # The name of this repository
+# Upptime configuration for the Seerly public status page.
+# Docs: https://upptime.js.org/docs/configuration
+#
+# ┌──────────────────────────────────────────────────────────────────────────┐
+# │ THIS FILE LIVES IN A PUBLIC GITHUB REPOSITORY.                           │
+# │ Every URL below is published to the status site, to history/summary.json │
+# │ and to auto-created incident issues.                                     │
+# │ NEVER add a third-party vendor URL or vendor name as a monitor.          │
+# │ Dependency health is exposed ONLY through our own anonymized             │
+# │ /health/deps/* proxy endpoints. See SETUP.md.                            │
+# └──────────────────────────────────────────────────────────────────────────┘
+#
+# PHASE 1 (now): only the three front-end rows are active. The seven API rows
+# are commented out ON PURPOSE — the /api/health/* routes are not deployed yet,
+# so enabling them now would mark seven components "down" and auto-open seven
+# public incident issues.
+#
+# PHASE 2 (after airo-backend deploys): uncomment the block below, confirm each
+# URL answers 200 (e.g. `curl -i https://seerly.app/api/health/db`), then commit.
+# Verified 2026-07-27: https://seerly.app/api/health already returns
+# {"status":"ok",...}, so https://seerly.app/api is the correct API base.
+
+owner: Seerly-AI # GitHub username or organization
+repo: status # GitHub repository name
+user-agent: Seerly-AI # Sent on GitHub API requests (docs recommend the GH username)
 
 sites:
-  - name: Google
-    url: https://www.google.com
-  - name: Wikipedia
-    url: https://en.wikipedia.org
-  - name: Hacker News
-    url: https://news.ycombinator.com
-  - name: Secret Site
-    url: $SECRET_SITE
+  - name: Website
+    url: https://seerly.app/
+  - name: Blog & Content
+    url: https://seerly.app/blog
+  - name: App / Dashboard
+    url: https://seerly.app/login
+
+  # ---- PHASE 2: uncomment once the health routes are deployed ----
+  # - name: Core API
+  #   url: https://seerly.app/api/health
+  # - name: Database
+  #   url: https://seerly.app/api/health/db
+  # - name: Background Jobs
+  #   url: https://seerly.app/api/health/queues
+  # - name: AI Agents
+  #   url: https://seerly.app/api/health/agents
+  # - name: AI Providers
+  #   url: https://seerly.app/api/health/deps/ai
+  # - name: Payments
+  #   url: https://seerly.app/api/health/deps/payments
+  # - name: Email Delivery
+  #   url: https://seerly.app/api/health/deps/email
 
 status-website:
-  # Add your custom domain name, or remove the `cname` line if you don't have a domain
-  # Uncomment the `baseUrl` line if you don't have a custom domain and add your repo name there
-  cname: demo.upptime.js.org
-  # baseUrl: /your-repo-name
-  logoUrl: https://raw.githubusercontent.com/upptime/upptime.js.org/master/static/img/icon.svg
-  name: Upptime
-  introTitle: "**Upptime** is the open-source uptime monitor and status page, powered entirely by GitHub."
-  introMessage: This is a sample status page which uses **real-time** data from our [GitHub repository](https://github.com/upptime/upptime). No server required — just GitHub Actions, Issues, and Pages. [**Get your own for free**](https://github.com/upptime/upptime)
-  navbar:
-    - title: Status
-      href: /
-    - title: GitHub
-      href: https://github.com/$OWNER/$REPO
-
-# Upptime also supports notifications, assigning issues, and more
-# See https://upptime.js.org/docs/configuration
+  cname: status.seerly.app
+  name: Seerly Status
+  introTitle: "**Seerly** system status"
+  introMessage: Live health of Seerly components, checked every few minutes.
+  theme: dark
