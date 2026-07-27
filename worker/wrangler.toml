@@ -1,0 +1,25 @@
+name = "seerly-status-proxy"
+main = "src/worker.js"
+compatibility_date = "2026-07-27"
+
+# Serve the proxy from status-api.seerly.app.
+#
+# A Workers Custom Domain creates and manages the DNS record for you — do NOT also add a
+# CNAME for `status-api` by hand in the Cloudflare dashboard, or the two will conflict.
+#
+# Note this is a DIFFERENT hostname from the status page itself (status.seerly.app, which
+# is a CNAME to GitHub Pages and must stay grey-clouded / DNS-only).
+[[routes]]
+pattern = "status-api.seerly.app"
+custom_domain = true
+
+# The token is a Worker SECRET, never a var — vars are readable in the dashboard and end
+# up in `wrangler deploy` output. Set it with:
+#
+#   wrangler secret put GITHUB_TOKEN
+#
+# The repository is PUBLIC, so this token needs NO scopes and NO repository access at all.
+# An unscoped token still authenticates, which is the only thing we need: it lifts the
+# rate limit from 60/hour to 5,000/hour. If it ever leaks it grants nothing that an
+# anonymous request could not already do — which is a direct benefit of the status repo
+# being public.

@@ -58,6 +58,22 @@ status-website:
   # otherwise the navbar reads "Seerly · Seerly Status".
   name: Status
 
+  # ---------------------------------------------------------------------------------
+  # GitHub proxy — UNCOMMENT ONLY AFTER THE WORKER IS DEPLOYED AND VERIFIED.
+  #
+  # The status page calls GitHub from the visitor's browser. Unauthenticated requests
+  # are capped at 60/hour PER IP (shared by everyone behind the same NAT), and each page
+  # load spends ~3 API calls, so shared addresses hit GitHub's "Rate limit exceeded"
+  # page — worst during an incident, when traffic spikes.
+  #
+  # worker/ proxies both hosts with a token (5,000/hour) and 60s edge caching.
+  # Enabling these before status-api.seerly.app answers will BREAK the page: every
+  # request would go to a hostname that does not resolve.
+  #
+  # apiBaseUrl: https://status-api.seerly.app/api
+  # userContentBaseUrl: https://status-api.seerly.app/raw
+  # ---------------------------------------------------------------------------------
+
   introTitle: "**Seerly** system status"
   # Do NOT promise a check frequency here. The workflows request */5, but GitHub
   # queues scheduled Actions and runs them when a machine is free — measured gaps on
