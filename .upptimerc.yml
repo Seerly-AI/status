@@ -54,9 +54,14 @@ workflowSchedule:
 status-website:
   cname: status.seerly.app
 
-  # The logo already carries the "Seerly" wordmark, so `name` is just "Status" —
-  # otherwise the navbar reads "Seerly · Seerly Status".
-  name: Status
+  # `name` is not just navbar text — Upptime uses it as the <title>. Setting it to
+  # "Status" alone (to avoid repeating the wordmark logo) left the browser tab, bookmarks
+  # and search results reading simply "Status", which is useless out of context.
+  #
+  # Fixed at the other end instead: the logo is now the square Seerly mark rather than the
+  # wordmark, so "Seerly Status" beside it reads correctly and the title is meaningful.
+  # As a bonus this drops a 309 KB navbar image to 36 KB.
+  name: Seerly Status
 
   # ---------------------------------------------------------------------------------
   # GitHub proxy (worker/). Live and verified 2026-07-27.
@@ -100,8 +105,46 @@ status-website:
   # site root), NOT from seerly.app. A status page must not load assets from the
   # infrastructure it monitors — otherwise it renders broken during the exact outage
   # it exists to report.
-  logoUrl: https://status.seerly.app/seerly-logo.png
+  logoUrl: https://status.seerly.app/apple-touch-icon.png
   favicon: https://status.seerly.app/favicon.ico
+
+  # --- Metadata -------------------------------------------------------------------
+  # `metaTags` renders ONLY name/content pairs — verified in the built bundle, which does
+  # T(n,"name",...) and T(n,"content",...) with no `property` support. Twitter cards use
+  # name=, so they work here; Open Graph uses property= and must go in customHeadHtml.
+  metaTags:
+    - name: description
+      content:
+        Live operational status for Seerly — website, dashboard, API, database, background
+        jobs, AI agents and integrations. Monitored independently of Seerly's own
+        infrastructure.
+    - name: robots
+      content: index, follow
+    # Overrides Upptime's default #333333 so mobile browser chrome matches the theme
+    # background (--body-background-color in seerly.css).
+    - name: theme-color
+      content: "#09090b"
+    - name: twitter:card
+      content: summary_large_image
+    - name: twitter:title
+      content: Seerly Status
+    - name: twitter:description
+      content: Live operational status for Seerly, monitored independently of Seerly's own infrastructure.
+    - name: twitter:image
+      content: https://status.seerly.app/og-image.png
+
+  # Open Graph needs property=, which metaTags cannot emit. Assets are served from THIS
+  # repo, not seerly.app, for the same reason as the logo and stylesheet: the status page
+  # must not depend on the infrastructure it reports on.
+  customHeadHtml: >-
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Seerly" />
+    <meta property="og:title" content="Seerly Status" />
+    <meta property="og:description" content="Live operational status for Seerly, monitored independently of Seerly's own infrastructure." />
+    <meta property="og:url" content="https://status.seerly.app/" />
+    <meta property="og:image" content="https://status.seerly.app/og-image.png" />
+    <link rel="canonical" href="https://status.seerly.app/" />
+  # --------------------------------------------------------------------------------
 
   # No "Status" entry: it links to the page you are already on, and the navbar name
   # already says Status. No "Seerly" entry either — the logo is the brand, and it
