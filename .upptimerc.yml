@@ -53,9 +53,22 @@ workflowSchedule:
 
 status-website:
   cname: status.seerly.app
-  name: Seerly Status
+
+  # The logo already carries the "Seerly" wordmark, so `name` is just "Status" —
+  # otherwise the navbar reads "Seerly · Seerly Status".
+  name: Status
+
   introTitle: "**Seerly** system status"
-  introMessage: Live health of Seerly components, checked every few minutes.
+  # Do NOT promise a check frequency here. The workflows request */5, but GitHub
+  # queues scheduled Actions and runs them when a machine is free — measured gaps on
+  # Upptime's own reference instance are 56–221 minutes. Claiming "every few minutes"
+  # is a promise this page cannot keep. What IS true and worth saying: the monitoring
+  # runs entirely outside Seerly's own infrastructure, so an outage here cannot hide
+  # an outage there.
+  introMessage:
+    Every component below is checked automatically from outside Seerly's own
+    infrastructure, so this page keeps reporting even when Seerly is down. Uptime and
+    response times update throughout the day.
 
   # `theme` is the base; `themeUrl` overrides it with the Seerly palette.
   theme: dark
@@ -68,10 +81,11 @@ status-website:
   logoUrl: https://status.seerly.app/seerly-logo.png
   favicon: https://status.seerly.app/favicon.ico
 
+  # No "Status" entry: it links to the page you are already on, and the navbar name
+  # already says Status. No "Seerly" entry either — the logo is the brand, and it
+  # links here; these link OUT, so they are named for where they go.
   navbar:
-    - title: Status
-      href: /
-    - title: Seerly
+    - title: Website
       href: https://seerly.app
     - title: Blog
       href: https://seerly.app/blog
