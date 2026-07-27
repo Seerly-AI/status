@@ -36,6 +36,21 @@ sites:
   - name: Email Delivery
     url: https://seerly.app/api/health/deps/email
 
+# Upptime's time-series "database" is the git commit history of history/<slug>.yml —
+# calculate-response-time.ts derives every data point by parsing response times out of
+# commit messages. Two commands write those commits:
+#   * Uptime CI       -> update()      commits ONLY when a site changes up/down/degraded
+#   * Response Time CI-> update(true)  runs a fresh check and ALWAYS commits
+# So response-time resolution is set by the Response Time CI cron, not the uptime one.
+# Upptime's default is "0 23 * * *" — a single data point per day. Hourly gives 24x the
+# resolution at the cost of ~10 commits per run (one per site).
+#
+# NOTE: these workflow files are GENERATED from this block. Do not edit
+# .github/workflows/*.yml by hand — change the cron here and let CI regenerate them.
+workflowSchedule:
+  responseTime: "0 * * * *" # hourly (was daily) — response-time data points
+  uptime: "*/5 * * * *" # up/down detection; GitHub throttles this heavily in practice
+
 status-website:
   cname: status.seerly.app
   name: Seerly Status
