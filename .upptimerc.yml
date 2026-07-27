@@ -9,16 +9,6 @@
 # │ Dependency health is exposed ONLY through our own anonymized             │
 # │ /health/deps/* proxy endpoints. See SETUP.md.                            │
 # └──────────────────────────────────────────────────────────────────────────┘
-#
-# PHASE 1 (now): only the three front-end rows are active. The seven API rows
-# are commented out ON PURPOSE — the /api/health/* routes are not deployed yet,
-# so enabling them now would mark seven components "down" and auto-open seven
-# public incident issues.
-#
-# PHASE 2 (after airo-backend deploys): uncomment the block below, confirm each
-# URL answers 200 (e.g. `curl -i https://seerly.app/api/health/db`), then commit.
-# Verified 2026-07-27: https://seerly.app/api/health already returns
-# {"status":"ok",...}, so https://seerly.app/api is the correct API base.
 
 owner: Seerly-AI # GitHub username or organization
 repo: status # GitHub repository name
@@ -51,4 +41,24 @@ status-website:
   name: Seerly Status
   introTitle: "**Seerly** system status"
   introMessage: Live health of Seerly components, checked every few minutes.
+
+  # `theme` is the base; `themeUrl` overrides it with the Seerly palette.
   theme: dark
+  themeUrl: https://status.seerly.app/seerly.css
+
+  # Logo and favicon are served from THIS repo's assets/ directory (published at the
+  # site root), NOT from seerly.app. A status page must not load assets from the
+  # infrastructure it monitors — otherwise it renders broken during the exact outage
+  # it exists to report.
+  logoUrl: https://status.seerly.app/seerly-logo.png
+  favicon: https://status.seerly.app/favicon.ico
+
+  navbar:
+    - title: Status
+      href: /
+    - title: Seerly
+      href: https://seerly.app
+    - title: Blog
+      href: https://seerly.app/blog
+    - title: Contact
+      href: https://seerly.app/contact
