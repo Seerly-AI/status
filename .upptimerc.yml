@@ -31,22 +31,20 @@ sites:
     url: https://seerly.app/blog
   - name: App / Dashboard
     url: https://seerly.app/login
-
-  # ---- PHASE 2: uncomment once the health routes are deployed ----
-  # - name: Core API
-  #   url: https://seerly.app/api/health
-  # - name: Database
-  #   url: https://seerly.app/api/health/db
-  # - name: Background Jobs
-  #   url: https://seerly.app/api/health/queues
-  # - name: AI Agents
-  #   url: https://seerly.app/api/health/agents
-  # - name: AI Providers
-  #   url: https://seerly.app/api/health/deps/ai
-  # - name: Payments
-  #   url: https://seerly.app/api/health/deps/payments
-  # - name: Email Delivery
-  #   url: https://seerly.app/api/health/deps/email
+  - name: Core API
+    url: https://seerly.app/api/health
+  - name: Database
+    url: https://seerly.app/api/health/db
+  - name: Background Jobs
+    url: https://seerly.app/api/health/queues
+  - name: AI Agents
+    url: https://seerly.app/api/health/agents
+  - name: AI Providers
+    url: https://seerly.app/api/health/deps/ai
+  - name: Payments
+    url: https://seerly.app/api/health/deps/payments
+  - name: Email Delivery
+    url: https://seerly.app/api/health/deps/email
 
 status-website:
   cname: status.seerly.app
