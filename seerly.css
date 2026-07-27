@@ -1,0 +1,102 @@
+/*
+ * Seerly status page theme.
+ *
+ * Referenced from .upptimerc.yml as:
+ *   status-website:
+ *     themeUrl: https://status.seerly.app/seerly.css
+ *
+ * Everything in the repo's `assets/` directory is served at the site root, so this
+ * file lands at /seerly.css.
+ *
+ * Colours are Seerly's own dark-mode design tokens from seerly-front/app/globals.css,
+ * converted from oklch() to hex for predictability:
+ *   --background        oklch(0.141 0.005 285.823)  ->  #09090b
+ *   --card              oklch(0.21  0.006 285.885)  ->  #18181b
+ *   --secondary/border  oklch(0.274 0.006 286.033)  ->  #27272a
+ *   --foreground        oklch(0.75  0     0     )   ->  #aeaeae
+ *   --muted-foreground  oklch(0.705 0.015 286.067)  ->  #9f9fa9
+ *   --primary (dark)    oklch(0.696 0.17  162.48 )  ->  #00bc7d
+ *   --destructive       oklch(0.704 0.191 22.216)   ->  #ff6467
+ *
+ * The full list of variables Upptime supports is in its own dark theme:
+ * https://github.com/upptime/status-page/blob/HEAD/static/themes/dark.css
+ */
+
+/* Outfit is Seerly's brand sans. Loaded from Google Fonts; if it fails the stack
+   falls back to system sans, which degrades gracefully — deliberate for a page
+   whose whole job is to work when other things don't. */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Surfaces */
+  --body-background-color: #09090b;
+  --body-text-color: #aeaeae;
+  --card-background-color: #18181b;
+  --card-border-color: #27272a;
+
+  /* Navbar */
+  --nav-background-color: #18181b;
+  --nav-border-bottom-color: #27272a;
+  --nav-current-border-bottom-color: #00bc7d;
+
+  /* Operational — Seerly primary green */
+  --up-border-left-color: #00bc7d;
+  --tag-up-background-color: #00bc7d;
+  --tag-color: #09090b; /* text ON the status tags: dark on bright */
+
+  /* Degraded — amber (matches the footer pill's amber-500) */
+  --degraded-border-left-color: #f59e0b;
+  --tag-degraded-background-color: #f59e0b;
+  --change-background-color: #f59e0b;
+
+  /* Down — Seerly destructive red, on a deep red card */
+  --down-border-left-color: #ff6467;
+  --down-background-color: #3f1214;
+  --tag-down-background-color: #ff6467;
+
+  /* Buttons */
+  --submit-button-background-color: #00bc7d;
+  --submit-button-border-color: #00bc7d;
+  --submit-button-color: #09090b;
+  --error-button-background-color: #ff6467;
+  --error-button-border-color: #ff6467;
+  --error-button-color: #09090b;
+
+  /* Response-time graphs are rendered images; leave them untouched. */
+  --graph-opacity: 1;
+  --graph-filter: none;
+}
+
+/* --- Beyond the variables: typography and shape to match seerly.app --- */
+
+body {
+  font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* seerly-front uses --radius: 0.65rem throughout. */
+.card,
+[class*='card'] {
+  border-radius: 0.65rem;
+}
+
+/* Uptime percentages and status tags read better slightly tighter. */
+[class*='tag'] {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+a {
+  color: #00bc7d;
+}
+
+a:hover {
+  color: #34d399;
+}
