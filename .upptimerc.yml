@@ -59,19 +59,25 @@ status-website:
   name: Status
 
   # ---------------------------------------------------------------------------------
-  # GitHub proxy — UNCOMMENT ONLY AFTER THE WORKER IS DEPLOYED AND VERIFIED.
+  # GitHub proxy (worker/). Live and verified 2026-07-27.
   #
-  # The status page calls GitHub from the visitor's browser. Unauthenticated requests
-  # are capped at 60/hour PER IP (shared by everyone behind the same NAT), and each page
-  # load spends ~3 API calls, so shared addresses hit GitHub's "Rate limit exceeded"
-  # page — worst during an incident, when traffic spikes.
+  # The status page calls GitHub from the visitor's browser, where unauthenticated
+  # requests are capped at 60/hour PER IP — shared by everyone behind the same NAT. Each
+  # page load spends ~3 API calls, so shared addresses hit GitHub's "Rate limit exceeded"
+  # page instead of this one, worst during an incident when traffic spikes.
   #
-  # worker/ proxies both hosts with a token (5,000/hour) and 60s edge caching.
-  # Enabling these before status-api.seerly.app answers will BREAK the page: every
-  # request would go to a hostname that does not resolve.
+  # The Worker authenticates server-side and caches for 60s at Cloudflare's edge.
+  # Measured through it: X-RateLimit-Limit 5000 (vs 60 direct).
   #
-  # apiBaseUrl: https://status-api.seerly.app/api
-  # userContentBaseUrl: https://status-api.seerly.app/raw
+  # BOTH keys are required. apiBaseUrl covers the Octokit calls (incidents, maintenance);
+  # userContentBaseUrl covers the graphs and summary data on raw.githubusercontent.com.
+  # Setting only one leaves half the page on the unauthenticated path.
+  #
+  # Hosted on *.workers.dev rather than status-api.seerly.app because the seerly.app zone
+  # lives in a Cloudflare account where this login has no Workers role. The hostname is
+  # only ever read by the page's JavaScript, never shown to visitors. See worker/README.md.
+  apiBaseUrl: https://seerly-status-proxy.rakesh-menon-account.workers.dev/api
+  userContentBaseUrl: https://seerly-status-proxy.rakesh-menon-account.workers.dev/raw
   # ---------------------------------------------------------------------------------
 
   introTitle: "**Seerly** system status"

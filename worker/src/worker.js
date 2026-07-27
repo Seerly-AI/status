@@ -122,18 +122,27 @@ export default {
       upstreamHeaders.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
     }
 
+    // Deliberately no `cf: { cacheTtl, cacheEverything }` here. We already cache
+    // explicitly through the Cache API below; layering the edge's own cache hints on top
+    // was redundant and coincided with intermittent Cloudflare 1042 errors on the
+    // upstream fetch. One caching mechanism, owned by us, is easier to reason about.
     let upstream;
     try {
       upstream = await fetch(target + url.search, {
         method: 'GET',
         headers: upstreamHeaders,
-        cf: { cacheTtl: CACHE_TTL_SECONDS, cacheEverything: true },
       });
     } catch (err) {
       return deny(502, 'Upstream request failed', origin);
     }
 
-    const response = new Response(upstream.body, {
+    // Buffer the body rather than streaming it. A streamed body cannot be shared between
+    // the response we return and the copy we hand to cache.put() without the two racing
+    // over the same stream. These payloads are small JSON/SVG documents, so the cost is
+    // negligible and the behaviour becomes deterministic.
+    const body = await upstream.arrayBuffer();
+
+    const response = new Response(body, {
       status: upstream.status,
       headers: {
         'Content-Type': upstream.headers.get('Content-Type') || 'application/json',
@@ -142,10 +151,16 @@ export default {
         ...corsHeaders(origin),
       },
     });
-    const link = upstream.headers.get('Link');
-    if (link) response.headers.set('Link', link);
-    const etag = upstream.headers.get('ETag');
-    if (etag) response.headers.set('ETag', etag);
+    // Forward pagination + rate-limit metadata. Octokit reads Link; the X-RateLimit-*
+    // headers are how we can tell from outside whether the token is actually being
+    // applied — an authenticated request reports a limit of 5000, an unauthenticated one
+    // reports 60. Without this passthrough a mis-named secret would fail silently, and
+    // the proxy would quietly run anonymous from shared Cloudflare IPs: strictly worse
+    // than not proxying at all.
+    for (const h of ['Link', 'ETag', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset']) {
+      const v = upstream.headers.get(h);
+      if (v) response.headers.set(h, v);
+    }
 
     // Never cache errors — a transient 5xx must not pin the status page to a failure
     // for a full minute.

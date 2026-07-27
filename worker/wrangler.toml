@@ -2,16 +2,37 @@ name = "seerly-status-proxy"
 main = "src/worker.js"
 compatibility_date = "2026-07-27"
 
-# Serve the proxy from status-api.seerly.app.
+# Pinned to "Rakesh Menon - Account". Without this, wrangler remembers a previously
+# selected account and silently retries against "Sumeetchawla2005@gmail.com's Account",
+# where the membership has no Workers role — failing with
+# "Authentication error [code: 10000]" and no chance to pick a different account.
+account_id = "4b414c2bbcf02a3f832f1727420bcef3"
+
+# DEPLOY TARGET
 #
-# A Workers Custom Domain creates and manages the DNS record for you — do NOT also add a
-# CNAME for `status-api` by hand in the Cloudflare dashboard, or the two will conflict.
+# Deployed to "Rakesh Menon - Account" (4b414c2bbcf02a3f832f1727420bcef3) on the default
+# *.workers.dev hostname. The custom domain below is commented out on purpose.
 #
-# Note this is a DIFFERENT hostname from the status page itself (status.seerly.app, which
-# is a CNAME to GitHub Pages and must stay grey-clouded / DNS-only).
-[[routes]]
-pattern = "status-api.seerly.app"
-custom_domain = true
+# Why: status-api.seerly.app requires the seerly.app zone to live in the SAME Cloudflare
+# account as the Worker. That zone is in "Sumeetchawla2005@gmail.com's Account", where the
+# membership roles are zone-scoped only (Domain Administrator / Domain DNS / Zone
+# Versioning) with no Workers role — so `wrangler deploy` there fails with
+# "Authentication error [code: 10000]" when it tries to create the service.
+#
+# The workers.dev hostname is functionally identical here: it is only ever read by the
+# status page's JavaScript via apiBaseUrl/userContentBaseUrl, never shown to visitors, and
+# it still runs on Cloudflare's edge — so the page remains independent of Seerly's own
+# infrastructure, which is the point of the proxy.
+#
+# TO SWITCH TO THE BRANDED HOSTNAME LATER: ask the super admin of the account holding
+# seerly.app to grant a Workers role, then uncomment the block below and redeploy. A
+# Workers Custom Domain manages its own DNS record — do NOT also add a `status-api` CNAME
+# by hand, and leave status.seerly.app itself DNS-only/grey-cloud so GitHub can renew its
+# certificate.
+#
+# [[routes]]
+# pattern = "status-api.seerly.app"
+# custom_domain = true
 
 # The token is a Worker SECRET, never a var — vars are readable in the dashboard and end
 # up in `wrangler deploy` output. Set it with:
