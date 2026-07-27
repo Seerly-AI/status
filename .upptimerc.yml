@@ -120,10 +120,13 @@ status-website:
         infrastructure.
     - name: robots
       content: index, follow
-    # Overrides Upptime's default #333333 so mobile browser chrome matches the theme
-    # background (--body-background-color in seerly.css).
-    - name: theme-color
-      content: "#09090b"
+    # NOTE: theme-color is deliberately NOT set here. Upptime hardcodes
+    # <meta name="theme-color" content="#333333"> near the top of <head>, and both
+    # metaTags and customHeadHtml are injected after it. Browsers honour the FIRST
+    # theme-color, so ours was silently ignored — verified in the deployed HTML
+    # (#333333 at char 125, ours at 1942). Changing it needs a patch to the upstream
+    # status-page template, not config. #333333 is close enough to the #09090b theme
+    # background that it is not worth forking over.
     - name: twitter:card
       content: summary_large_image
     - name: twitter:title
