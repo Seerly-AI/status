@@ -21,15 +21,58 @@ sites:
     url: https://seerly.app/blog
   - name: App / Dashboard
     url: https://seerly.app/login
+  # ONLY PUBLISH WHAT WE CAN INDEPENDENTLY VERIFY.
+  #
+  # Every row below is probed through the airo-backend API process, so when that process
+  # is unhealthy the probe fails and Upptime reports the component "down" — even if the
+  # component itself is perfectly fine. On 2026-07-31 an unhealthy backend container
+  # opened four incidents (#2-#5), two of which were FALSE: Postgres was healthy and the
+  # seerly-agents service (a separate VM) was running the whole time. We had no evidence
+  # for either claim; we simply could not reach the process that asks.
+  #
+  # The fix is to name every row for the CAPABILITY a user loses, never for the box we
+  # think broke. "AI Agents is down" was read as a claim about the seerly-agents service,
+  # which was running fine; "Agent execution is down" is true either way, because agent
+  # runs are delivered through the API and are genuinely unavailable when it is unhealthy.
+  #
+  # "Database" is gone entirely — folded into Core API, which now probes /health/ready
+  # (liveness + database). A database the API cannot reach makes the API unusable, so it
+  # is reported as one observed fact instead of a separate claim about Postgres that
+  # nothing here can verify.
+  #
+  # The /health/db and /health/agents endpoints still exist and are still correct — use
+  # them for internal alerting, where "the API cannot reach Postgres" is exactly the
+  # signal you want. They just cannot support a public claim about those components.
+  #
+  # To report the agents service itself (independent of the API), it has to be observed
+  # independently: either a public health endpoint on the agents VM, or an outbound
+  # heartbeat whose freshness is monitored. Until then this row tracks the capability.
+  # PENDING: switch to /api/health/ready once airo-backend is deployed.
+  #
+  # /health/ready (liveness + database) is where the removed "Database" row goes: a
+  # database the API cannot reach makes the API unusable, so it becomes one observed fact
+  # rather than a separate claim about Postgres we cannot verify independently.
+  #
+  # It deliberately is NOT /health — that endpoint is the container's own HEALTHCHECK
+  # (Dockerfile:81 and every compose file), so it must stay dependency-free: a 503 on a
+  # Postgres blip would fail the probe 3x and restart the container, making the status
+  # page cause outages instead of reporting them.
+  #
+  # Left on /health until the deploy lands, because pointing this row at an endpoint that
+  # still 404s would open a false incident — the exact failure this whole change fixes.
   - name: Core API
     url: https://seerly.app/api/health
-  - name: Database
-    url: https://seerly.app/api/health/db
   - name: Background Jobs
     url: https://seerly.app/api/health/queues
-  - name: AI Agents
+  # Was "AI Agents", which read as a claim about the seerly-agents service — a service
+  # that was running throughout the 2026-07-31 incident. This name describes the
+  # capability instead, which is accurate whether the agents VM or the API is at fault.
+  - name: Agent execution
     url: https://seerly.app/api/health/agents
-  - name: AI Providers
+  # Capability names, not vendor names. "AI Providers is down" would blame a third party
+  # for what is usually our own outage; "AI generation" describes what users lose, which
+  # is true whether the vendor or our API is at fault.
+  - name: AI generation
     url: https://seerly.app/api/health/deps/ai
   - name: Payments
     url: https://seerly.app/api/health/deps/payments
