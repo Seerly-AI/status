@@ -1,7 +1,7 @@
 url: https://seerly.app/api/health/db
-status: up
-code: 200
-responseTime: 305
-lastUpdated: 2026-07-31T06:11:42.601Z
+status: down
+code: 503
+responseTime: 22
+lastUpdated: 2026-07-31T09:43:16.812Z
 startTime: 2026-07-27T13:42:09.844Z
 generator: Upptime <https://github.com/upptime/upptime>
