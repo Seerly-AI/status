@@ -47,21 +47,16 @@ sites:
   # To report the agents service itself (independent of the API), it has to be observed
   # independently: either a public health endpoint on the agents VM, or an outbound
   # heartbeat whose freshness is monitored. Until then this row tracks the capability.
-  # PENDING: switch to /api/health/ready once airo-backend is deployed.
+  # /health/ready = liveness + database. This is where the removed "Database" row went: a
+  # database the API cannot reach makes the API unusable, so it is reported as one observed
+  # fact rather than a separate claim about Postgres we cannot verify independently.
   #
-  # /health/ready (liveness + database) is where the removed "Database" row goes: a
-  # database the API cannot reach makes the API unusable, so it becomes one observed fact
-  # rather than a separate claim about Postgres we cannot verify independently.
-  #
-  # It deliberately is NOT /health — that endpoint is the container's own HEALTHCHECK
+  # Deliberately NOT /health — that endpoint is the container's own HEALTHCHECK
   # (Dockerfile:81 and every compose file), so it must stay dependency-free: a 503 on a
-  # Postgres blip would fail the probe 3x and restart the container, making the status
-  # page cause outages instead of reporting them.
-  #
-  # Left on /health until the deploy lands, because pointing this row at an endpoint that
-  # still 404s would open a false incident — the exact failure this whole change fixes.
+  # Postgres blip would fail the probe 3x and restart the container, making the status page
+  # cause outages instead of reporting them. A test in airo-backend pins that separation.
   - name: Core API
-    url: https://seerly.app/api/health
+    url: https://seerly.app/api/health/ready
   - name: Background Jobs
     url: https://seerly.app/api/health/queues
   # Was "AI Agents", which read as a claim about the seerly-agents service — a service

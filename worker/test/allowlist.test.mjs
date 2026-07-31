@@ -78,6 +78,35 @@ for (const m of ['POST', 'PUT', 'DELETE', 'PATCH']) {
   check('preflight carries CORS', !!res.headers.get('Access-Control-Allow-Methods'));
 }
 
+console.log('\n--- preflight header negotiation (the Safari bug) ---');
+{
+  // Octokit sets a `user-agent` header. Chrome strips it (forbidden header name) so the
+  // request stays simple; Safari sends it, forcing a preflight. A hardcoded
+  // Access-Control-Allow-Headers that omitted user-agent made that preflight fail, the
+  // fetch throw, and the page render "An error occurred" — in Safari only.
+  const res = await worker.fetch(
+    new Request('https://status-api.seerly.app/api/repos/Seerly-AI/status/issues', {
+      method: 'OPTIONS',
+      headers: { Origin: ORIGIN, 'Access-Control-Request-Headers': 'user-agent, accept' },
+    }),
+    env,
+    ctx
+  );
+  const allowed = (res.headers.get('Access-Control-Allow-Headers') || '').toLowerCase();
+  check('echoes the headers the browser asked for', allowed.includes('user-agent') && allowed.includes('accept'), allowed);
+  check('preflight is cacheable', res.headers.get('Access-Control-Max-Age') === '86400');
+  check('varies on requested headers', (res.headers.get('Vary') || '').includes('Access-Control-Request-Headers'));
+}
+{
+  // No Access-Control-Request-Headers → fall back to a list at least as permissive as
+  // GitHub's own, so we never allow fewer headers than the origin we front.
+  const { res } = await call('/api/repos/Seerly-AI/status/issues', 'OPTIONS');
+  const allowed = (res.headers.get('Access-Control-Allow-Headers') || '').toLowerCase();
+  for (const h of ['user-agent', 'accept', 'if-none-match', 'x-github-api-version']) {
+    check(`default allow-list includes ${h}`, allowed.includes(h), allowed);
+  }
+}
+
 console.log('\n--- path traversal ---');
 {
   const { res, sent } = await call('/api/repos/Seerly-AI/status/../../../user');

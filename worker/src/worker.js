@@ -44,15 +44,39 @@ const ALLOWED_ORIGINS = ['https://status.seerly.app', 'https://seerly-ai.github.
 /** Edge cache lifetime. Uptime data changes on the order of minutes, never seconds. */
 const CACHE_TTL_SECONDS = 60;
 
-function corsHeaders(origin) {
+/**
+ * Headers GitHub's own API permits. We must be at least as permissive: a proxy that
+ * allows FEWER headers than the origin it fronts silently breaks clients that worked
+ * before it existed.
+ *
+ * This bit us in Safari. Octokit sets a `user-agent` header; Chrome strips it (it is a
+ * forbidden header name) so the request stays "simple" and skips preflight, but Safari
+ * sends it, which forces a preflight. The old hardcoded list here — Accept, Content-Type,
+ * If-None-Match — did not include user-agent, so Safari's preflight failed, the fetch
+ * threw, and the page rendered "An error occurred". Chrome was fine, which is exactly
+ * what made it look like a Safari bug rather than ours.
+ */
+const DEFAULT_ALLOWED_HEADERS =
+  'Accept, Accept-Encoding, Authorization, Content-Type, If-Match, If-Modified-Since, ' +
+  'If-None-Match, If-Unmodified-Since, User-Agent, X-Requested-With, X-GitHub-Api-Version';
+
+/**
+ * @param origin        the requesting page's origin
+ * @param requestedHeaders  value of Access-Control-Request-Headers on a preflight; echoed
+ *                          back so we never reject a header the browser actually needs.
+ */
+function corsHeaders(origin, requestedHeaders) {
   const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
-    'Access-Control-Allow-Headers': 'Accept, Content-Type, If-None-Match',
+    'Access-Control-Allow-Headers': requestedHeaders || DEFAULT_ALLOWED_HEADERS,
     // Octokit reads pagination and rate-limit metadata off the response.
     'Access-Control-Expose-Headers': 'ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset',
-    Vary: 'Origin',
+    // Preflights are per (origin, method, headers); caching them for a day keeps Safari
+    // from paying an extra round trip before every API call.
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin, Access-Control-Request-Headers',
   };
 }
 
@@ -88,7 +112,10 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders(origin) });
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders(origin, request.headers.get('Access-Control-Request-Headers')),
+      });
     }
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return deny(405, 'Only GET and HEAD are proxied', origin);
