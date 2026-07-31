@@ -58,19 +58,19 @@
     "url": "https://seerly.app/api/health",
     "icon": "https://icons.duckduckgo.com/ip3/seerly.app.ico",
     "slug": "core-api",
-    "status": "down",
-    "uptime": "99.99%",
-    "uptimeDay": "99.95%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
+    "status": "up",
+    "uptime": "99.40%",
+    "uptimeDay": "97.70%",
+    "uptimeWeek": "99.40%",
+    "uptimeMonth": "99.40%",
+    "uptimeYear": "99.40%",
     "time": 182,
-    "timeDay": 210,
+    "timeDay": 206,
     "timeWeek": 182,
     "timeMonth": 182,
     "timeYear": 182,
     "dailyMinutesDown": {
-      "2026-07-31": 1
+      "2026-07-31": 33
     }
   },
   {
@@ -78,19 +78,19 @@
     "url": "https://seerly.app/api/health/db",
     "icon": "https://icons.duckduckgo.com/ip3/seerly.app.ico",
     "slug": "database",
-    "status": "down",
-    "uptime": "99.99%",
-    "uptimeDay": "99.96%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
-    "time": 212,
-    "timeDay": 235,
-    "timeWeek": 212,
-    "timeMonth": 212,
-    "timeYear": 212,
+    "status": "up",
+    "uptime": "99.41%",
+    "uptimeDay": "97.71%",
+    "uptimeWeek": "99.41%",
+    "uptimeMonth": "99.41%",
+    "uptimeYear": "99.41%",
+    "time": 211,
+    "timeDay": 229,
+    "timeWeek": 211,
+    "timeMonth": 211,
+    "timeYear": 211,
     "dailyMinutesDown": {
-      "2026-07-31": 1
+      "2026-07-31": 33
     }
   },
   {
@@ -98,19 +98,19 @@
     "url": "https://seerly.app/api/health/queues",
     "icon": "https://icons.duckduckgo.com/ip3/seerly.app.ico",
     "slug": "background-jobs",
-    "status": "down",
-    "uptime": "99.99%",
-    "uptimeDay": "99.98%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
+    "status": "up",
+    "uptime": "99.41%",
+    "uptimeDay": "97.72%",
+    "uptimeWeek": "99.41%",
+    "uptimeMonth": "99.41%",
+    "uptimeYear": "99.41%",
     "time": 191,
-    "timeDay": 223,
+    "timeDay": 219,
     "timeWeek": 191,
     "timeMonth": 191,
     "timeYear": 191,
     "dailyMinutesDown": {
-      "2026-07-31": 0
+      "2026-07-31": 33
     }
   },
   {
@@ -118,19 +118,19 @@
     "url": "https://seerly.app/api/health/agents",
     "icon": "https://icons.duckduckgo.com/ip3/seerly.app.ico",
     "slug": "ai-agents",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.99%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 183,
-    "timeDay": 193,
-    "timeWeek": 183,
-    "timeMonth": 183,
-    "timeYear": 183,
+    "status": "up",
+    "uptime": "99.41%",
+    "uptimeDay": "97.74%",
+    "uptimeWeek": "99.41%",
+    "uptimeMonth": "99.41%",
+    "uptimeYear": "99.41%",
+    "time": 181,
+    "timeDay": 185,
+    "timeWeek": 181,
+    "timeMonth": 181,
+    "timeYear": 181,
     "dailyMinutesDown": {
-      "2026-07-31": 0
+      "2026-07-31": 33
     }
   },
   {
