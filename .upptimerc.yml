@@ -59,11 +59,25 @@ sites:
     url: https://seerly.app/api/health/ready
   - name: Background Jobs
     url: https://seerly.app/api/health/queues
-  # Was "AI Agents", which read as a claim about the seerly-agents service — a service
-  # that was running throughout the 2026-07-31 incident. This name describes the
-  # capability instead, which is accurate whether the agents VM or the API is at fault.
+  # INDEPENDENT SIGNAL (switched 2026-08-01).
+  #
+  # Previously probed via airo-backend's /api/health/agents, which meant an unhealthy
+  # backend container published "AI Agents is down" while seerly-agents was running fine
+  # (incident #5, 2026-07-31) — a claim nothing had verified.
+  #
+  # Now seerly-agents POSTs a heartbeat to the status Worker every 3 minutes (and once on
+  # bootstrap); the Worker answers 200 while the last beat is under 10 minutes old, 503
+  # otherwise. An airo-backend outage no longer touches this row.
+  #
+  # Type the URL exactly: `/health/agents/` (trailing slash) and `/health/Agents` both miss
+  # the route and fall through to the proxy's deny path, returning 403 — which Upptime reads
+  # as DOWN, not as a typo.
+  #
+  # What this row means: "the agents process is alive and can reach the internet". A
+  # wedged-but-running process (pool exhaustion, say) still beats green while agent runs
+  # fail. Narrower than the name suggests, but it is a claim we can actually verify.
   - name: Agent execution
-    url: https://seerly.app/api/health/agents
+    url: https://seerly-status-proxy.rakesh-menon-account.workers.dev/health/agents
   # Capability names, not vendor names. "AI Providers is down" would blame a third party
   # for what is usually our own outage; "AI generation" describes what users lose, which
   # is true whether the vendor or our API is at fault.

@@ -20,8 +20,8 @@
  * proxy — or the status page — down with it.
  *
  * The status page is configured to reach it via two keys in .upptimerc.yml:
- *   status-website.apiBaseUrl         -> https://status-api.seerly.app/api
- *   status-website.userContentBaseUrl -> https://status-api.seerly.app/raw
+ *   status-website.apiBaseUrl         -> <worker-host>/api
+ *   status-website.userContentBaseUrl -> <worker-host>/raw
  */
 
 /** Path prefix -> upstream origin. */
@@ -106,6 +106,114 @@ function resolveTarget(pathname) {
   return null;
 }
 
+/**
+ * HEARTBEAT ("dead man's switch")
+ * ------------------------------------------------------------------------------------
+ * Some components cannot be observed from outside. seerly-agents runs on its own VM with
+ * no public hostname, so the status page used to infer its health from an airo-backend
+ * endpoint — which meant an unhealthy backend container reported "AI Agents is down" while
+ * the agents service was running perfectly (incident #5, 2026-07-31).
+ *
+ * Instead of opening that VM to the internet, it reports outward: the service POSTs a beat
+ * on a timer, and this Worker answers GET /health/<component> based on how long ago the
+ * last beat arrived. If the agents service dies, beats stop and the row goes red —
+ * independently of airo-backend, which is the whole point.
+ *
+ * Honest limitation: this proves "the component is alive and can reach the internet", so a
+ * dead beat-sender looks like a dead component. That is why the sender lives inside the
+ * component itself rather than somewhere adjacent to it.
+ */
+
+/** Components allowed to beat. Anything else is refused, so the endpoint cannot be used as free storage. */
+const BEAT_COMPONENTS = new Set(['agents']);
+
+/**
+ * A component is considered up if its last beat is younger than this.
+ * Senders beat every 3 minutes, so this tolerates two missed beats before going red —
+ * enough to ride out a restart or a slow network without flapping.
+ */
+const BEAT_STALE_AFTER_MS = 10 * 60 * 1000;
+
+/**
+ * KV keys expire on their own so a component that is decommissioned stops answering
+ * instead of lingering. Comfortably longer than the staleness window.
+ */
+const BEAT_KEY_TTL_SECONDS = 24 * 60 * 60;
+
+/** Length-safe, non-short-circuiting comparison so a wrong secret leaks nothing via timing. */
+function secretsMatch(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function beatJson(status, body) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      // Never cache: a cached "ok" would keep reporting a dead component as alive, which
+      // is precisely the failure this endpoint exists to prevent.
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+/** POST /beat/<component> — record a heartbeat. Requires the shared secret. */
+async function recordBeat(request, env, component, now) {
+  if (!BEAT_COMPONENTS.has(component)) return beatJson(404, { status: 'unknown component' });
+  // Fail closed: with no secret configured, anyone could forge liveness.
+  if (!env.STATUS_BEAT_SECRET) return beatJson(503, { status: 'unavailable' });
+
+  const presented =
+    request.headers.get('X-Beat-Secret') ||
+    (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+  if (!secretsMatch(presented, env.STATUS_BEAT_SECRET)) return beatJson(401, { status: 'unauthorized' });
+
+  if (!env.STATUS_BEATS) return beatJson(503, { status: 'unavailable' });
+
+  // A rejected put() would escape fetch() as an opaque Cloudflare 1101. The realistic
+  // trigger is the free tier's 1,000 writes/day cap, after which beats stop landing for
+  // the rest of the UTC day and a healthy service reads as dead — the exact false report
+  // this heartbeat exists to end. Answer honestly instead: the sender logs it, and the
+  // health route keeps reporting on whatever the last good beat was.
+  try {
+    await env.STATUS_BEATS.put(`beat:${component}`, String(now), {
+      expirationTtl: BEAT_KEY_TTL_SECONDS,
+    });
+  } catch {
+    return beatJson(503, { status: 'unavailable' });
+  }
+  return beatJson(202, { status: 'ok' });
+}
+
+/**
+ * GET /health/<component> — what Upptime monitors. Public and unauthenticated, like every
+ * other status probe, and it reveals only up/down.
+ */
+async function readBeat(env, component, now) {
+  if (!BEAT_COMPONENTS.has(component)) return beatJson(404, { status: 'unknown component' });
+  if (!env.STATUS_BEATS) return beatJson(503, { status: 'unavailable' });
+
+  let raw;
+  try {
+    raw = await env.STATUS_BEATS.get(`beat:${component}`);
+  } catch {
+    // A KV read failure is not evidence the component is down, but it is also not evidence
+    // it is up. Report unavailable rather than inventing a green.
+    return beatJson(503, { status: 'unavailable' });
+  }
+  const last = raw ? Number(raw) : NaN;
+  // No beat ever recorded, or an unparseable one, means we have no evidence of life.
+  // Reporting "up" here would be a claim we cannot support.
+  if (!Number.isFinite(last)) return beatJson(503, { status: 'unavailable' });
+
+  const ageMs = now - last;
+  const fresh = ageMs >= 0 && ageMs <= BEAT_STALE_AFTER_MS;
+  return beatJson(fresh ? 200 : 503, { status: fresh ? 'ok' : 'unavailable' });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get('Origin') || '';
@@ -117,6 +225,22 @@ export default {
         headers: corsHeaders(origin, request.headers.get('Access-Control-Request-Headers')),
       });
     }
+
+    // Heartbeat routes are handled before the GitHub proxy: they are not proxied traffic
+    // and POST is legitimate here, unlike everywhere else in this Worker.
+    const beatMatch = url.pathname.match(/^\/beat\/([a-z0-9-]{1,32})$/);
+    if (beatMatch) {
+      if (request.method !== 'POST') return beatJson(405, { status: 'method not allowed' });
+      return recordBeat(request, env, beatMatch[1], Date.now());
+    }
+    const healthMatch = url.pathname.match(/^\/health\/([a-z0-9-]{1,32})$/);
+    if (healthMatch) {
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        return beatJson(405, { status: 'method not allowed' });
+      }
+      return readBeat(env, healthMatch[1], Date.now());
+    }
+
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return deny(405, 'Only GET and HEAD are proxied', origin);
     }

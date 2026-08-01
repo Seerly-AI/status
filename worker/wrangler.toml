@@ -34,6 +34,35 @@ account_id = "4b414c2bbcf02a3f832f1727420bcef3"
 # pattern = "status-api.seerly.app"
 # custom_domain = true
 
+# Heartbeat storage for components that cannot be probed from outside (see worker.js).
+# Create it once, then paste the printed id here:
+#
+#   npx wrangler kv namespace create STATUS_BEATS
+#
+# Free-tier KV allows 1,000 writes/day. Senders beat every 3 minutes = 480/day for one
+# component, so there is room for a second component but not for a 1-minute interval.
+# If you add more senders, widen the interval rather than the budget.
+# COMMENTED OUT ON PURPOSE: a placeholder id here fails EVERY `wrangler deploy`, including
+# an unrelated hotfix to the live GitHub proxy. Create the namespace, paste the real id
+# (KV namespace ids are not secrets), then uncomment.
+#
+# Until then the Worker deploys fine and the heartbeat routes fail closed — /beat/* and
+# /health/* answer 503 because env.STATUS_BEATS is undefined, which is honest: with no
+# storage there is no evidence of life.
+#
+[[kv_namespaces]]
+binding = "STATUS_BEATS"
+id = "3901d5246d6b4d389381cda6712fbec0"
+
+# Secrets, never vars — vars are readable in the dashboard and echoed by `wrangler deploy`:
+#
+#   npx wrangler secret put GITHUB_TOKEN   # lifts the GitHub rate limit (no scopes needed)
+#   npx wrangler secret put STATUS_BEAT_SECRET    # shared with seerly-agents; authorises POST /beat/*
+#
+# STATUS_BEAT_SECRET only authorises "component X is alive" claims. Worst case if it leaks is a
+# forged heartbeat — someone could keep a row green while the component is dead. Rotate by
+# running the command again and updating STATUS_BEAT_SECRET on the agents VM.
+#
 # The token is a Worker SECRET, never a var — vars are readable in the dashboard and end
 # up in `wrangler deploy` output. Set it with:
 #
