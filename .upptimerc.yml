@@ -17,10 +17,13 @@ user-agent: Seerly-AI # Sent on GitHub API requests (docs recommend the GH usern
 sites:
   - name: Website
     url: https://seerly.app/
+    icon: https://status.seerly.app/apple-touch-icon.png
   - name: Blog & Content
     url: https://seerly.app/blog
+    icon: https://status.seerly.app/apple-touch-icon.png
   - name: App / Dashboard
     url: https://seerly.app/login
+    icon: https://status.seerly.app/apple-touch-icon.png
   # ONLY PUBLISH WHAT WE CAN INDEPENDENTLY VERIFY.
   #
   # Every row below is probed through the airo-backend API process, so when that process
@@ -44,9 +47,17 @@ sites:
   # them for internal alerting, where "the API cannot reach Postgres" is exactly the
   # signal you want. They just cannot support a public claim about those components.
   #
-  # To report the agents service itself (independent of the API), it has to be observed
-  # independently: either a public health endpoint on the agents VM, or an outbound
-  # heartbeat whose freshness is monitored. Until then this row tracks the capability.
+  # "Agent execution" is now the exception: as of 2026-08-01 it is observed independently
+  # via an outbound heartbeat (see that row below), so an airo-backend outage no longer
+  # affects it. Every other row here still reports through the API and is worded as a
+  # capability claim for that reason.
+  #
+  # `icon` is set explicitly on every row. Left unset, Upptime derives it from the
+  # monitored hostname as https://icons.duckduckgo.com/ip3/<host>.ico — which put a
+  # third-party dependency on the page, and gave the heartbeat row a generic grey
+  # placeholder because DuckDuckGo has no favicon for the workers.dev host. Self-hosted
+  # from this repo, like the logo, stylesheet and og-image.
+
   # /health/ready = liveness + database. This is where the removed "Database" row went: a
   # database the API cannot reach makes the API unusable, so it is reported as one observed
   # fact rather than a separate claim about Postgres we cannot verify independently.
@@ -57,8 +68,10 @@ sites:
   # cause outages instead of reporting them. A test in airo-backend pins that separation.
   - name: Core API
     url: https://seerly.app/api/health/ready
+    icon: https://status.seerly.app/apple-touch-icon.png
   - name: Background Jobs
     url: https://seerly.app/api/health/queues
+    icon: https://status.seerly.app/apple-touch-icon.png
   # INDEPENDENT SIGNAL (switched 2026-08-01).
   #
   # Previously probed via airo-backend's /api/health/agents, which meant an unhealthy
@@ -78,15 +91,19 @@ sites:
   # fail. Narrower than the name suggests, but it is a claim we can actually verify.
   - name: Agent execution
     url: https://seerly-status-proxy.rakesh-menon-account.workers.dev/health/agents
+    icon: https://status.seerly.app/apple-touch-icon.png
   # Capability names, not vendor names. "AI Providers is down" would blame a third party
   # for what is usually our own outage; "AI generation" describes what users lose, which
   # is true whether the vendor or our API is at fault.
   - name: AI generation
     url: https://seerly.app/api/health/deps/ai
+    icon: https://status.seerly.app/apple-touch-icon.png
   - name: Payments
     url: https://seerly.app/api/health/deps/payments
+    icon: https://status.seerly.app/apple-touch-icon.png
   - name: Email Delivery
     url: https://seerly.app/api/health/deps/email
+    icon: https://status.seerly.app/apple-touch-icon.png
 
 # Upptime's time-series "database" is the git commit history of history/<slug>.yml —
 # calculate-response-time.ts derives every data point by parsing response times out of
