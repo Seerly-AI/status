@@ -22,19 +22,19 @@
     "url": "https://seerly.app/blog",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "blog-and-content",
-    "status": "down",
-    "uptime": "99.99%",
-    "uptimeDay": "99.63%",
-    "uptimeWeek": "99.95%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
-    "time": 288,
-    "timeDay": 1024,
-    "timeWeek": 254,
-    "timeMonth": 288,
-    "timeYear": 288,
+    "status": "up",
+    "uptime": "99.97%",
+    "uptimeDay": "99.25%",
+    "uptimeWeek": "99.89%",
+    "uptimeMonth": "99.97%",
+    "uptimeYear": "99.97%",
+    "time": 287,
+    "timeDay": 988,
+    "timeWeek": 253,
+    "timeMonth": 287,
+    "timeYear": 287,
     "dailyMinutesDown": {
-      "2026-08-26": 5
+      "2026-08-26": 11
     }
   },
   {
@@ -42,19 +42,19 @@
     "url": "https://seerly.app/login",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "app-dashboard",
-    "status": "down",
-    "uptime": "99.99%",
-    "uptimeDay": "99.72%",
-    "uptimeWeek": "99.96%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
+    "status": "up",
+    "uptime": "99.98%",
+    "uptimeDay": "99.34%",
+    "uptimeWeek": "99.91%",
+    "uptimeMonth": "99.98%",
+    "uptimeYear": "99.98%",
     "time": 223,
-    "timeDay": 1001,
-    "timeWeek": 234,
+    "timeDay": 965,
+    "timeWeek": 233,
     "timeMonth": 223,
     "timeYear": 223,
     "dailyMinutesDown": {
-      "2026-08-26": 4
+      "2026-08-26": 10
     }
   },
   {
@@ -62,20 +62,20 @@
     "url": "https://seerly.app/api/health/ready",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "core-api",
-    "status": "down",
-    "uptime": "99.92%",
-    "uptimeDay": "99.80%",
-    "uptimeWeek": "99.97%",
-    "uptimeMonth": "99.92%",
-    "uptimeYear": "99.92%",
+    "status": "up",
+    "uptime": "99.90%",
+    "uptimeDay": "99.42%",
+    "uptimeWeek": "99.92%",
+    "uptimeMonth": "99.90%",
+    "uptimeYear": "99.90%",
     "time": 220,
-    "timeDay": 1013,
+    "timeDay": 975,
     "timeWeek": 234,
     "timeMonth": 220,
     "timeYear": 220,
     "dailyMinutesDown": {
       "2026-07-31": 33,
-      "2026-08-26": 3
+      "2026-08-26": 8
     }
   },
   {
@@ -83,20 +83,20 @@
     "url": "https://seerly.app/api/health/queues",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "background-jobs",
-    "status": "down",
-    "uptime": "99.92%",
-    "uptimeDay": "99.88%",
-    "uptimeWeek": "99.98%",
-    "uptimeMonth": "99.92%",
-    "uptimeYear": "99.92%",
+    "status": "up",
+    "uptime": "99.91%",
+    "uptimeDay": "99.50%",
+    "uptimeWeek": "99.93%",
+    "uptimeMonth": "99.91%",
+    "uptimeYear": "99.91%",
     "time": 217,
-    "timeDay": 993,
-    "timeWeek": 227,
+    "timeDay": 955,
+    "timeWeek": 226,
     "timeMonth": 217,
     "timeYear": 217,
     "dailyMinutesDown": {
       "2026-07-31": 33,
-      "2026-08-26": 2
+      "2026-08-26": 7
     }
   },
   {
@@ -122,19 +122,19 @@
     "url": "https://seerly.app/api/health/deps/ai",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "ai-generation",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.94%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "status": "up",
+    "uptime": "99.98%",
+    "uptimeDay": "99.56%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.98%",
+    "uptimeYear": "99.98%",
     "time": 294,
-    "timeDay": 234,
+    "timeDay": 238,
     "timeWeek": 228,
     "timeMonth": 294,
     "timeYear": 294,
     "dailyMinutesDown": {
-      "2026-08-26": 1
+      "2026-08-26": 6
     }
   },
   {
@@ -142,19 +142,19 @@
     "url": "https://seerly.app/api/health/deps/payments",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "payments",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.96%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 896,
-    "timeDay": 778,
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.57%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.99%",
+    "uptimeYear": "99.99%",
+    "time": 895,
+    "timeDay": 782,
     "timeWeek": 841,
-    "timeMonth": 896,
-    "timeYear": 896,
+    "timeMonth": 895,
+    "timeYear": 895,
     "dailyMinutesDown": {
-      "2026-08-26": 1
+      "2026-08-26": 6
     }
   },
   {
@@ -162,19 +162,19 @@
     "url": "https://seerly.app/api/health/deps/email",
     "icon": "https://status.seerly.app/apple-touch-icon.png",
     "slug": "email-delivery",
-    "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "99.97%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.58%",
+    "uptimeWeek": "99.94%",
+    "uptimeMonth": "99.99%",
+    "uptimeYear": "99.99%",
     "time": 280,
-    "timeDay": 224,
-    "timeWeek": 212,
+    "timeDay": 228,
+    "timeWeek": 213,
     "timeMonth": 280,
     "timeYear": 280,
     "dailyMinutesDown": {
-      "2026-08-26": 0
+      "2026-08-26": 6
     }
   }
 ]
